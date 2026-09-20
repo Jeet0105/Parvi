@@ -168,6 +168,11 @@ script refuses to run when NODE_ENV is production.
 | GET | `/api/families/:familyId/members` | Owner or permitted officer |
 | GET | `/api/members/:id` | Owner or permitted officer |
 | PUT | `/api/members/:id` | Owning citizen |
+| POST | `/api/relationships` | Owning citizen |
+| GET | `/api/relationships/pending` | Officers (district-scoped) |
+| GET | `/api/relationships/:id` | Owner or permitted officer |
+| PUT | `/api/relationships/:id/verify` | VERIFICATION_OFFICER, ADMIN |
+| GET | `/api/families/:familyId/relationships` | Owner or permitted officer |
 
 ## Build status
 
@@ -179,8 +184,8 @@ script refuses to run when NODE_ENV is production.
 | 4 | RBAC + admin user management | Done |
 | 5 | Family registration + Family ID | Done |
 | 6 | Family members | Done |
-| 7 | Relationships | In progress |
-| 8 | Family tree | Pending |
+| 7 | Relationships + officer verification | Done |
+| 8 | Family tree | In progress |
 | 9 | Documents | Pending |
 | 10 | Officer verification | Pending |
 | 11 | Duplicate detection | Pending |

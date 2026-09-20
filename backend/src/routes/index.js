@@ -5,6 +5,7 @@ const authRoutes = require('./auth.routes');
 const userRoutes = require('./user.routes');
 const familyRoutes = require('./family.routes');
 const memberRoutes = require('./member.routes');
+const relationshipRoutes = require('./relationship.routes');
 
 const router = express.Router();
 
@@ -13,5 +14,6 @@ router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/families', familyRoutes);
 router.use('/members', memberRoutes);
+router.use('/relationships', relationshipRoutes);
 
 module.exports = router;

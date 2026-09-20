@@ -7,6 +7,8 @@ import AdminUsersPage from './pages/AdminUsersPage';
 import CitizenDashboardPage from './pages/CitizenDashboardPage';
 import FamilyDetailPage from './pages/FamilyDetailPage';
 import FamilyMembersPage from './pages/FamilyMembersPage';
+import FamilyRelationshipsPage from './pages/FamilyRelationshipsPage';
+import VerificationQueuePage from './pages/VerificationQueuePage';
 import FamilyRegistrationPage from './pages/FamilyRegistrationPage';
 import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -42,12 +44,14 @@ export default function App() {
           <Route path="/family" element={<FamilyDetailPage />} />
           <Route path="/family/register" element={<FamilyRegistrationPage />} />
           <Route path="/family/members" element={<FamilyMembersPage />} />
+          <Route path="/family/relationships" element={<FamilyRelationshipsPage />} />
         </Route>
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={OFFICER_ROLES} />}>
         <Route element={<AppLayout />}>
           <Route path="/officer" element={<OfficerDashboardPage />} />
+          <Route path="/officer/relationships" element={<VerificationQueuePage />} />
         </Route>
       </Route>
 

@@ -8,12 +8,17 @@ const CITIZEN_NAV = [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/family', label: 'My Family' },
   { to: '/family/members', label: 'Members' },
+  { to: '/family/relationships', label: 'Relationships' },
 ];
 
-const OFFICER_NAV = [{ to: '/officer', label: 'Verification Queue' }];
+const OFFICER_NAV = [
+  { to: '/officer', label: 'Overview' },
+  { to: '/officer/relationships', label: 'Relationships' },
+];
 
 const ADMIN_NAV = [
-  { to: '/officer', label: 'Verification Queue' },
+  { to: '/officer', label: 'Overview' },
+  { to: '/officer/relationships', label: 'Relationships' },
   { to: '/admin/users', label: 'Users' },
 ];
 

@@ -68,3 +68,28 @@ export function formatCurrency(value) {
     maximumFractionDigits: 0,
   }).format(number);
 }
+
+export const RELATIONSHIP_TYPES = [
+  "FATHER",
+  "MOTHER",
+  "SON",
+  "DAUGHTER",
+  "SPOUSE",
+  "BROTHER",
+  "SISTER",
+  "GRANDFATHER",
+  "GRANDMOTHER",
+  "GRANDSON",
+  "GRANDDAUGHTER",
+];
+
+/** Title case for a relationship enum, e.g. GRANDFATHER -> Grandfather. */
+export function relationshipLabel(type) {
+  if (!type) return "";
+  return type.charAt(0) + type.slice(1).toLowerCase();
+}
+
+/** Reads a relationship the way a person would say it aloud. */
+export function describeRelationship({ fromMember, toMember, relationshipType }) {
+  return fromMember?.name + " is the " + relationshipLabel(relationshipType).toLowerCase() + " of " + toMember?.name;
+}

@@ -2,6 +2,7 @@ const express = require('express');
 
 const familyController = require('../controllers/family.controller');
 const memberController = require('../controllers/member.controller');
+const relationshipController = require('../controllers/relationship.controller');
 const { authenticate } = require('../middleware/auth.middleware');
 const { authorize, ROLES, OFFICER_ROLES } = require('../middleware/role.middleware');
 const {
@@ -21,6 +22,9 @@ const {
   listMembersQuerySchema,
   changeHeadSchema,
 } = require('../validators/member.validator');
+const {
+  listRelationshipsQuerySchema,
+} = require('../validators/relationship.validator');
 
 const router = express.Router();
 
@@ -75,6 +79,13 @@ router.put(
   validateParams(memberFamilyIdParamSchema),
   validateBody(changeHeadSchema),
   memberController.changeHead
+);
+
+router.get(
+  '/:familyId/relationships',
+  validateParams(memberFamilyIdParamSchema),
+  validateQuery(listRelationshipsQuerySchema),
+  relationshipController.listForFamily
 );
 
 module.exports = router;

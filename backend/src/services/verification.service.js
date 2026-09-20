@@ -1,4 +1,5 @@
 const { prisma } = require('../config/database');
+const { getCache, setCache, invalidateCache } = require('../config/redis');
 const AppError = require('../utils/AppError');
 const { ROLES } = require('../middleware/role.middleware');
 const audit = require('./audit.service');
@@ -252,6 +253,20 @@ async function listPendingFamilies({ user, page = 1, pageSize = 25 }) {
   };
 }
 
+const VERIFICATION_AUDIT_ACTIONS = [
+  'FAMILY_VERIFIED',
+  'FAMILY_REJECTED',
+  'MEMBER_VERIFIED',
+  'MEMBER_REJECTED',
+  'RELATIONSHIP_VERIFIED',
+  'RELATIONSHIP_REJECTED',
+  'DOCUMENT_VERIFIED',
+  'DOCUMENT_REJECTED',
+  'DUPLICATE_REVIEWED',
+  'BENEFICIARY_APPROVED',
+  'BENEFICIARY_REJECTED',
+];
+
 /**
  * Counts for the officer dashboard.
  *
@@ -260,6 +275,11 @@ async function listPendingFamilies({ user, page = 1, pageSize = 25 }) {
  */
 async function getStatistics({ user }) {
   const districtScoped = user.role === ROLES.DISTRICT_OFFICER;
+  const cacheKey = `stats:${user.role}:${districtScoped ? user.district || 'none' : 'all'}`;
+
+  const cached = await getCache(cacheKey);
+  if (cached) return cached;
+
   const familyScope = districtScoped ? { district: user.district } : {};
   const memberScope = districtScoped
     ? { family: { district: user.district } }
@@ -272,6 +292,8 @@ async function getStatistics({ user }) {
     pendingMembers,
     pendingRelationships,
     pendingDocuments,
+    duplicateAlerts,
+    pendingApplications,
   ] = await Promise.all([
     prisma.family.count({ where: { ...familyScope, status: 'PENDING_VERIFICATION' } }),
     prisma.family.count({ where: { ...familyScope, status: 'VERIFIED' } }),
@@ -297,16 +319,89 @@ async function getStatistics({ user }) {
         verificationStatus: { in: ['PENDING', 'UNDER_REVIEW'] },
       },
     }),
+    prisma.duplicateReview.count({
+      where: {
+        status: 'PENDING_REVIEW',
+        ...(districtScoped && user.district
+          ? { sourceMember: { family: { district: user.district } } }
+          : {}),
+      },
+    }),
+    prisma.beneficiaryApplication.count({
+      where: {
+        status: { in: ['APPLIED', 'UNDER_REVIEW'] },
+        ...(districtScoped && user.district
+          ? { family: { district: user.district } }
+          : {}),
+      },
+    }),
   ]);
 
-  return {
+  const stats = {
     scope: districtScoped ? user.district : 'All districts',
     pendingFamilies,
     pendingMembers,
     pendingRelationships,
     pendingDocuments,
+    duplicateAlerts,
+    pendingApplications,
     verifiedFamilies,
     totalFamilies,
+  };
+
+  await setCache(cacheKey, stats, 15);
+
+  return stats;
+}
+
+/**
+ * Retrieves past verification actions recorded in the audit trail.
+ */
+async function getVerificationHistory({ user, page = 1, pageSize = 20 }) {
+  const districtScoped = user.role === ROLES.DISTRICT_OFFICER;
+  const where = {
+    action: { in: VERIFICATION_AUDIT_ACTIONS },
+    ...(districtScoped && user.district
+      ? {
+          user: {
+            OR: [
+              { id: user.id },
+              { district: user.district },
+            ],
+          },
+        }
+      : {}),
+  };
+
+  const [history, total] = await Promise.all([
+    prisma.auditLog.findMany({
+      where,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            district: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.auditLog.count({ where }),
+  ]);
+
+  return {
+    history,
+    pagination: {
+      page,
+      pageSize,
+      total,
+      totalPages: Math.ceil(total / pageSize),
+    },
   };
 }
 
@@ -316,5 +411,7 @@ module.exports = {
   verifyMember,
   listPendingFamilies,
   getStatistics,
+  getVerificationHistory,
+  VERIFICATION_AUDIT_ACTIONS,
   DECISIONS,
 };

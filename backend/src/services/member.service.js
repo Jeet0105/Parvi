@@ -78,6 +78,14 @@ async function addMember({ user, familyId, data }) {
 
     return member;
   });
+
+  // Check for potential duplicate members asynchronously
+  const duplicateService = require('./duplicate.service');
+  duplicateService.findDuplicatesForMember(result.id).catch((err) => {
+    console.error('Duplicate detection error:', err.message);
+  });
+
+  return result;
 }
 
 async function listMembers({ user, familyId, includeInactive = true }) {

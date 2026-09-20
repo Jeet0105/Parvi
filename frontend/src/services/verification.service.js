@@ -22,3 +22,9 @@ export function verifyMember(memberId, { action, reason }) {
 export function getStatistics() {
   return apiClient.get('/dashboard/statistics');
 }
+
+export function getVerificationHistory({ page = 1, pageSize = 10 } = {}) {
+  return apiClient.get('/dashboard/history', {
+    params: { page, pageSize },
+  });
+}

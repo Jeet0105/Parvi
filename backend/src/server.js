@@ -2,6 +2,7 @@ require('dotenv').config({ quiet: true });
 
 const app = require('./app');
 const { connectDatabase, disconnectDatabase } = require('./config/database');
+const { initDuplicateWorker } = require('./jobs/duplicateWorker');
 
 const PORT = process.env.PORT || 5000;
 
@@ -10,6 +11,9 @@ async function start() {
   // requests that will all error at the database layer.
   await connectDatabase();
   console.log('Connected to PostgreSQL');
+
+  // Initialize background queues / workers
+  initDuplicateWorker();
 
   const server = app.listen(PORT, () => {
     console.log(`Family Identity Platform API listening on port ${PORT}`);

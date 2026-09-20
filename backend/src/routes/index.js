@@ -9,6 +9,10 @@ const relationshipRoutes = require('./relationship.routes');
 const documentRoutes = require('./document.routes');
 const verificationRoutes = require('./verification.routes');
 const dashboardRoutes = require('./dashboard.routes');
+const duplicateRoutes = require('./duplicate.routes');
+const schemeRoutes = require('./scheme.routes');
+const beneficiaryRoutes = require('./beneficiary.routes');
+const auditRoutes = require('./audit.routes');
 
 const router = express.Router();
 
@@ -21,5 +25,9 @@ router.use('/relationships', relationshipRoutes);
 router.use('/documents', documentRoutes);
 router.use('/verification', verificationRoutes);
 router.use('/dashboard', dashboardRoutes);
+router.use('/duplicates', duplicateRoutes);
+router.use('/schemes', schemeRoutes);
+router.use('/beneficiaries', beneficiaryRoutes);
+router.use('/audit', auditRoutes);
 
 module.exports = router;

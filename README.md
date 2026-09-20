@@ -180,6 +180,11 @@ script refuses to run when NODE_ENV is production.
 | GET | `/api/documents/:id` | Owner or permitted officer |
 | GET | `/api/documents/:id/file` | Owner or permitted officer |
 | PUT | `/api/documents/:id/verify` | VERIFICATION_OFFICER, ADMIN |
+| GET | `/api/verification/families/pending` | Officers (district-scoped) |
+| PUT | `/api/verification/families/:familyId` | VERIFICATION_OFFICER, ADMIN |
+| PUT | `/api/verification/members/:id` | VERIFICATION_OFFICER, ADMIN |
+| GET | `/api/dashboard/statistics` | Officers (district-scoped) |
+| GET | `/api/dashboard/history` | Officers (district-scoped) |
 
 ## Build status
 
@@ -194,14 +199,14 @@ script refuses to run when NODE_ENV is production.
 | 7 | Relationships + officer verification | Done |
 | 8 | Family tree | Done |
 | 9 | Documents | Done |
-| 10 | Officer verification | In progress |
-| 11 | Duplicate detection | Pending |
-| 12 | Government schemes | Pending |
-| 13 | Eligibility engine | Pending |
-| 14 | Beneficiary applications | Pending |
-| 15 | Audit log | Pending |
-| 16 | Family 360 dashboard | Pending |
-| 17 | Officer dashboard | Pending |
+| 10 | Officer verification | Done |
+| 11 | Officer verification dashboard | Done |
+| 12 | Duplicate detection | Pending |
+| 13 | Government schemes | Pending |
+| 14 | Eligibility engine | Pending |
+| 15 | Beneficiary applications | Pending |
+| 16 | Audit log | Pending |
+| 17 | Family 360 dashboard | Pending |
 
 ## Privacy
 

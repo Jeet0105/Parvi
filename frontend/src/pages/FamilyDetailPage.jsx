@@ -124,6 +124,25 @@ export default function FamilyDetailPage() {
         </section>
       )}
 
+      {family.status === 'VERIFIED' && (
+        <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4">
+          <div>
+            <p className="text-sm font-semibold text-emerald-950">
+              Family Verified & Eligible for Government Schemes
+            </p>
+            <p className="mt-0.5 text-sm text-emerald-800">
+              Your family identity is fully certified. Explore welfare schemes and apply for benefits now.
+            </p>
+          </div>
+          <Link
+            to="/schemes"
+            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-emerald-700"
+          >
+            Explore & Apply Schemes
+          </Link>
+        </section>
+      )}
+
       <section className="rounded-xl border border-slate-200 bg-white p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

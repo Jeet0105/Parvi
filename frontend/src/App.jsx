@@ -5,13 +5,17 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AppLayout from './layouts/AppLayout';
 import AuthLayout from './layouts/AuthLayout';
 import AdminUsersPage from './pages/AdminUsersPage';
+import AuditLogPage from './pages/AuditLogPage';
+import BeneficiaryQueuePage from './pages/BeneficiaryQueuePage';
 import CitizenDashboardPage from './pages/CitizenDashboardPage';
 import FamilyDetailPage from './pages/FamilyDetailPage';
 import FamilyMembersPage from './pages/FamilyMembersPage';
 import DocumentQueuePage from './pages/DocumentQueuePage';
+import DuplicateQueuePage from './pages/DuplicateQueuePage';
 import FamilyDocumentsPage from './pages/FamilyDocumentsPage';
 import FamilyQueuePage from './pages/FamilyQueuePage';
 import FamilyRelationshipsPage from './pages/FamilyRelationshipsPage';
+import SchemesPage from './pages/SchemesPage';
 import VerificationQueuePage from './pages/VerificationQueuePage';
 import FamilyRegistrationPage from './pages/FamilyRegistrationPage';
 import LoginPage from './pages/LoginPage';
@@ -54,6 +58,8 @@ export default function App() {
           <Route path="/family/members" element={<FamilyMembersPage />} />
           <Route path="/family/relationships" element={<FamilyRelationshipsPage />} />
           <Route path="/family/documents" element={<FamilyDocumentsPage />} />
+          <Route path="/schemes" element={<SchemesPage />} />
+          <Route path="/family/schemes" element={<SchemesPage />} />
           <Route
             path="/family/tree"
             element={
@@ -71,6 +77,9 @@ export default function App() {
           <Route path="/officer/relationships" element={<VerificationQueuePage />} />
           <Route path="/officer/documents" element={<DocumentQueuePage />} />
           <Route path="/officer/families" element={<FamilyQueuePage />} />
+          <Route path="/officer/duplicates" element={<DuplicateQueuePage />} />
+          <Route path="/officer/beneficiaries" element={<BeneficiaryQueuePage />} />
+          <Route path="/officer/audit" element={<AuditLogPage />} />
         </Route>
       </Route>
 

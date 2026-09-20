@@ -11,6 +11,7 @@ const CITIZEN_NAV = [
   { to: '/family/relationships', label: 'Relationships' },
   { to: '/family/tree', label: 'Family Tree' },
   { to: '/family/documents', label: 'Documents' },
+  { to: '/schemes', label: 'Schemes' },
 ];
 
 const OFFICER_NAV = [
@@ -18,6 +19,9 @@ const OFFICER_NAV = [
   { to: '/officer/families', label: 'Families' },
   { to: '/officer/relationships', label: 'Relationships' },
   { to: '/officer/documents', label: 'Documents' },
+  { to: '/officer/duplicates', label: 'Duplicates' },
+  { to: '/officer/beneficiaries', label: 'Beneficiaries' },
+  { to: '/officer/audit', label: 'Audit Trail' },
 ];
 
 const ADMIN_NAV = [
@@ -25,6 +29,9 @@ const ADMIN_NAV = [
   { to: '/officer/families', label: 'Families' },
   { to: '/officer/relationships', label: 'Relationships' },
   { to: '/officer/documents', label: 'Documents' },
+  { to: '/officer/duplicates', label: 'Duplicates' },
+  { to: '/officer/beneficiaries', label: 'Beneficiaries' },
+  { to: '/officer/audit', label: 'Audit Trail' },
   { to: '/admin/users', label: 'Users' },
 ];
 

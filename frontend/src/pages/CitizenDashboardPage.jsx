@@ -69,12 +69,51 @@ export default function CitizenDashboardPage() {
             <StatusBadge status={family.status} />
           </div>
 
-          <Link
-            to="/family"
-            className="mt-5 inline-block rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
-          >
-            View family
-          </Link>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              to="/family"
+              className="inline-block rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
+            >
+              View family
+            </Link>
+            <Link
+              to="/schemes"
+              className="inline-block rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+            >
+              Explore Schemes & Benefits
+            </Link>
+          </div>
+
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <Link
+              to="/family/members"
+              className="rounded-lg border border-slate-200 p-3 text-center transition hover:border-brand-300 hover:bg-brand-50/30"
+            >
+              <p className="text-xs text-slate-500">Members</p>
+              <p className="text-base font-bold text-slate-800">{family.members?.length ?? 0}</p>
+            </Link>
+            <Link
+              to="/family/relationships"
+              className="rounded-lg border border-slate-200 p-3 text-center transition hover:border-brand-300 hover:bg-brand-50/30"
+            >
+              <p className="text-xs text-slate-500">Relationships</p>
+              <p className="text-base font-bold text-slate-800">Map Tree</p>
+            </Link>
+            <Link
+              to="/family/tree"
+              className="rounded-lg border border-slate-200 p-3 text-center transition hover:border-brand-300 hover:bg-brand-50/30"
+            >
+              <p className="text-xs text-slate-500">Family Tree</p>
+              <p className="text-base font-bold text-slate-800">Interactive</p>
+            </Link>
+            <Link
+              to="/family/documents"
+              className="rounded-lg border border-slate-200 p-3 text-center transition hover:border-brand-300 hover:bg-brand-50/30"
+            >
+              <p className="text-xs text-slate-500">Documents</p>
+              <p className="text-base font-bold text-slate-800">Verify</p>
+            </Link>
+          </div>
         </section>
       ) : (
         <section className="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center">

@@ -42,10 +42,19 @@ async function statistics(req, res) {
   return success(res, 200, 'Statistics retrieved', stats);
 }
 
+async function history(req, res) {
+  const result = await verificationService.getVerificationHistory({
+    user: req.user,
+    ...req.validated?.query,
+  });
+  return success(res, 200, 'Verification history retrieved', result);
+}
+
 module.exports = {
   submit,
   verifyFamily,
   verifyMember,
   pendingFamilies,
   statistics,
+  history,
 };

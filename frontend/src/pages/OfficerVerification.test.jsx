@@ -19,6 +19,11 @@ vi.mock('../services/verification.service');
 
 beforeEach(() => {
   vi.resetAllMocks();
+  if (verificationApi.getVerificationHistory) {
+    verificationApi.getVerificationHistory.mockResolvedValue({
+      data: { history: [], pagination: { total: 0, page: 1, totalPages: 1 } },
+    });
+  }
 });
 
 const districtOfficer = {
@@ -35,6 +40,8 @@ const stats = {
   pendingMembers: 5,
   pendingRelationships: 3,
   pendingDocuments: 4,
+  duplicateAlerts: 1,
+  pendingApplications: 2,
   verifiedFamilies: 7,
   totalFamilies: 9,
 };
@@ -130,6 +137,41 @@ describe('OfficerDashboardPage', () => {
     renderWithProviders(<App />, { route: '/officer', user: officer });
 
     expect(await screen.findByText(/every queue is clear/i)).toBeInTheDocument();
+  });
+
+  it('shows duplicate alerts and beneficiary application counts', async () => {
+    verificationApi.getStatistics.mockResolvedValue({ data: stats });
+    renderWithProviders(<App />, { route: '/officer', user: officer });
+
+    await screen.findByText(/awaiting a decision/i);
+    const main = within(screen.getByRole('main'));
+    expect(main.getByText(/duplicate alerts/i)).toBeInTheDocument();
+    expect(main.getByText(/beneficiary apps/i)).toBeInTheDocument();
+  });
+
+  it('renders verification history audit logs', async () => {
+    verificationApi.getStatistics.mockResolvedValue({ data: stats });
+    verificationApi.getVerificationHistory.mockResolvedValue({
+      data: {
+        history: [
+          {
+            id: 'audit-1',
+            action: 'FAMILY_VERIFIED',
+            entityType: 'Family',
+            entityId: 'family-12345678',
+            createdAt: '2026-09-20T10:00:00.000Z',
+            user: { name: 'Officer Sharma', role: 'VERIFICATION_OFFICER' },
+            reason: null,
+          },
+        ],
+        pagination: { page: 1, pageSize: 8, total: 1, totalPages: 1 },
+      },
+    });
+
+    renderWithProviders(<App />, { route: '/officer', user: officer });
+
+    expect(await screen.findByText(/family verified/i)).toBeInTheDocument();
+    expect(screen.getByText(/officer sharma/i)).toBeInTheDocument();
   });
 
   it('reports a failure to load statistics', async () => {

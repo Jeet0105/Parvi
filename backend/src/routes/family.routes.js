@@ -4,6 +4,7 @@ const familyController = require('../controllers/family.controller');
 const memberController = require('../controllers/member.controller');
 const relationshipController = require('../controllers/relationship.controller');
 const treeController = require('../controllers/tree.controller');
+const documentServiceController = require('../controllers/family-document.controller');
 const { authenticate } = require('../middleware/auth.middleware');
 const { authorize, ROLES, OFFICER_ROLES } = require('../middleware/role.middleware');
 const {
@@ -94,6 +95,13 @@ router.get(
   validateParams(memberFamilyIdParamSchema),
   validateQuery(listRelationshipsQuerySchema),
   treeController.getTree
+);
+
+router.get(
+  '/:familyId/documents',
+  validateParams(memberFamilyIdParamSchema),
+  validateQuery(listRelationshipsQuerySchema),
+  documentServiceController.listForFamily
 );
 
 module.exports = router;

@@ -93,3 +93,30 @@ export function relationshipLabel(type) {
 export function describeRelationship({ fromMember, toMember, relationshipType }) {
   return fromMember?.name + " is the " + relationshipLabel(relationshipType).toLowerCase() + " of " + toMember?.name;
 }
+
+export const DOCUMENT_TYPES = [
+  "BIRTH_CERTIFICATE",
+  "MARRIAGE_CERTIFICATE",
+  "RATION_CARD",
+  "AFFIDAVIT",
+  "IDENTITY_PROOF",
+  "ADDRESS_PROOF",
+  "OTHER",
+];
+
+/** BIRTH_CERTIFICATE -> Birth Certificate */
+export function documentTypeLabel(type) {
+  if (!type) return "";
+  return type
+    .split("_")
+    .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
+    .join(" ");
+}
+
+/** Human-readable byte size for a stored document. */
+export function formatFileSize(bytes) {
+  if (!bytes) return "—";
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + " KB";
+  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+}

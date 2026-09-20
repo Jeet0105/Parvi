@@ -10,16 +10,19 @@ const CITIZEN_NAV = [
   { to: '/family/members', label: 'Members' },
   { to: '/family/relationships', label: 'Relationships' },
   { to: '/family/tree', label: 'Family Tree' },
+  { to: '/family/documents', label: 'Documents' },
 ];
 
 const OFFICER_NAV = [
   { to: '/officer', label: 'Overview' },
   { to: '/officer/relationships', label: 'Relationships' },
+  { to: '/officer/documents', label: 'Documents' },
 ];
 
 const ADMIN_NAV = [
   { to: '/officer', label: 'Overview' },
   { to: '/officer/relationships', label: 'Relationships' },
+  { to: '/officer/documents', label: 'Documents' },
   { to: '/admin/users', label: 'Users' },
 ];
 

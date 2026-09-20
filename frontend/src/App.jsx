@@ -8,6 +8,8 @@ import AdminUsersPage from './pages/AdminUsersPage';
 import CitizenDashboardPage from './pages/CitizenDashboardPage';
 import FamilyDetailPage from './pages/FamilyDetailPage';
 import FamilyMembersPage from './pages/FamilyMembersPage';
+import DocumentQueuePage from './pages/DocumentQueuePage';
+import FamilyDocumentsPage from './pages/FamilyDocumentsPage';
 import FamilyRelationshipsPage from './pages/FamilyRelationshipsPage';
 import VerificationQueuePage from './pages/VerificationQueuePage';
 import FamilyRegistrationPage from './pages/FamilyRegistrationPage';
@@ -50,6 +52,7 @@ export default function App() {
           <Route path="/family/register" element={<FamilyRegistrationPage />} />
           <Route path="/family/members" element={<FamilyMembersPage />} />
           <Route path="/family/relationships" element={<FamilyRelationshipsPage />} />
+          <Route path="/family/documents" element={<FamilyDocumentsPage />} />
           <Route
             path="/family/tree"
             element={
@@ -65,6 +68,7 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route path="/officer" element={<OfficerDashboardPage />} />
           <Route path="/officer/relationships" element={<VerificationQueuePage />} />
+          <Route path="/officer/documents" element={<DocumentQueuePage />} />
         </Route>
       </Route>
 

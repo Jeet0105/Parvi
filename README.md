@@ -174,6 +174,12 @@ script refuses to run when NODE_ENV is production.
 | PUT | `/api/relationships/:id/verify` | VERIFICATION_OFFICER, ADMIN |
 | GET | `/api/families/:familyId/relationships` | Owner or permitted officer |
 | GET | `/api/families/:familyId/tree` | Owner or permitted officer |
+| GET | `/api/families/:familyId/documents` | Owner or permitted officer |
+| POST | `/api/documents` | Owning citizen (multipart) |
+| GET | `/api/documents/pending` | Officers (district-scoped) |
+| GET | `/api/documents/:id` | Owner or permitted officer |
+| GET | `/api/documents/:id/file` | Owner or permitted officer |
+| PUT | `/api/documents/:id/verify` | VERIFICATION_OFFICER, ADMIN |
 
 ## Build status
 
@@ -187,8 +193,8 @@ script refuses to run when NODE_ENV is production.
 | 6 | Family members | Done |
 | 7 | Relationships + officer verification | Done |
 | 8 | Family tree | Done |
-| 9 | Documents | In progress |
-| 10 | Officer verification | Pending |
+| 9 | Documents | Done |
+| 10 | Officer verification | In progress |
 | 11 | Duplicate detection | Pending |
 | 12 | Government schemes | Pending |
 | 13 | Eligibility engine | Pending |

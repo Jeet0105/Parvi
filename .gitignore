@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.local
+backend/uploads/*
+!backend/uploads/.gitkeep
+logs/
+*.log
+dist/
+build/
+coverage/
+.DS_Store

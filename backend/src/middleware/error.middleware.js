@@ -7,21 +7,36 @@ function notFoundHandler(req, res) {
 }
 
 /**
+ * Maps errors raised by express.json() to sensible client errors, so a bad
+ * request body does not surface as an opaque 500.
+ */
+function mapBodyParserError(err) {
+  if (err.type === 'entity.parse.failed') {
+    return new AppError(400, 'Malformed JSON in request body');
+  }
+  if (err.type === 'entity.too.large') {
+    return new AppError(413, 'Request body too large');
+  }
+  return null;
+}
+
+/**
  * Centralized error middleware.
- * Never leaks stack traces, DB errors or secrets to the client.
+ * Never leaks stack traces, database errors or secrets to the client.
  */
 // eslint-disable-next-line no-unused-vars
 function errorHandler(err, req, res, next) {
-  const isOperational = err instanceof AppError;
-  const statusCode = isOperational ? err.statusCode : 500;
+  const mapped = err instanceof AppError ? err : mapBodyParserError(err);
 
-  if (!isOperational) {
-    // Unexpected failure: log the detail server-side only.
-    console.error('[unhandled error]', err);
+  if (mapped) {
+    return failure(res, mapped.statusCode, mapped.message, mapped.errors);
   }
 
-  const message = isOperational ? err.message : 'Something went wrong';
-  return failure(res, statusCode, message, isOperational ? err.errors : undefined);
+  // Unexpected failure: the detail stays server-side.
+  if (process.env.NODE_ENV !== 'test') {
+    console.error('[unhandled error]', err);
+  }
+  return failure(res, 500, 'Something went wrong');
 }
 
 module.exports = { notFoundHandler, errorHandler };

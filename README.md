@@ -125,8 +125,8 @@ Authorization is always enforced on the backend; frontend role checks are presen
 | --- | --- | --- |
 | 1 | Project init + health endpoint | Done |
 | 2 | Database + Prisma schema | Done |
-| 3 | Authentication | In progress |
-| 4 | RBAC | Pending |
+| 3 | Authentication | Done |
+| 4 | RBAC | In progress |
 | 5 | Family registration + Family ID | Pending |
 | 6 | Family members | Pending |
 | 7 | Relationships | Pending |

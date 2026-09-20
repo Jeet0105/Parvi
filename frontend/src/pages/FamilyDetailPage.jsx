@@ -2,9 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import Alert from '../components/Alert';
+import Button from '../components/Button';
 import Spinner from '../components/Spinner';
 import StatusBadge from '../components/StatusBadge';
 import * as familyApi from '../services/family.service';
+import * as verificationApi from '../services/verification.service';
 import { ageFrom, formatCurrency, formatDate } from '../utils/format';
 
 function SummaryRow({ label, children }) {
@@ -23,6 +25,8 @@ export default function FamilyDetailPage() {
   const [family, setFamily] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -41,9 +45,26 @@ export default function FamilyDetailPage() {
     load();
   }, [load]);
 
+  const handleSubmitForVerification = async () => {
+    setSubmitting(true);
+    setError('');
+    setNotice('');
+    try {
+      const response = await verificationApi.submitFamily(family.id);
+      setFamily(response.data.family);
+      setNotice('Your family has been submitted for verification.');
+    } catch (err) {
+      setError(err.errors?.[0]?.message || err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (loading) return <Spinner label="Loading your family" />;
 
-  if (error) {
+  // Only a failure to load replaces the page; a failed submission is shown
+  // inline so the family record stays visible.
+  if (error && !family) {
     return <Alert tone="error">{error}</Alert>;
   }
 
@@ -69,6 +90,38 @@ export default function FamilyDetailPage() {
         <Alert tone="success" title="Family registered">
           Your Family ID is <strong>{justCreated}</strong>. Keep it for your records.
         </Alert>
+      )}
+
+      {notice && <Alert tone="success">{notice}</Alert>}
+      {error && <Alert tone="error">{error}</Alert>}
+
+      {family.status === 'REJECTED' && family.rejectionReason && (
+        <Alert tone="error" title="Returned by a verification officer">
+          {family.rejectionReason}
+        </Alert>
+      )}
+
+      {family.status === 'PENDING_VERIFICATION' && (
+        <Alert tone="info">
+          Your family is with a verification officer. You can still add members
+          and documents while you wait.
+        </Alert>
+      )}
+
+      {(family.status === 'DRAFT' || family.status === 'REJECTED') && (
+        <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50/50 px-5 py-4">
+          <div>
+            <p className="text-sm font-semibold text-slate-900">
+              Ready for verification?
+            </p>
+            <p className="mt-0.5 text-sm text-slate-600">
+              Upload a supporting document for each member first, then submit.
+            </p>
+          </div>
+          <Button onClick={handleSubmitForVerification} loading={submitting}>
+            Submit for verification
+          </Button>
+        </section>
       )}
 
       <section className="rounded-xl border border-slate-200 bg-white p-6">

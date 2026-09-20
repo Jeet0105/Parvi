@@ -15,12 +15,14 @@ const CITIZEN_NAV = [
 
 const OFFICER_NAV = [
   { to: '/officer', label: 'Overview' },
+  { to: '/officer/families', label: 'Families' },
   { to: '/officer/relationships', label: 'Relationships' },
   { to: '/officer/documents', label: 'Documents' },
 ];
 
 const ADMIN_NAV = [
   { to: '/officer', label: 'Overview' },
+  { to: '/officer/families', label: 'Families' },
   { to: '/officer/relationships', label: 'Relationships' },
   { to: '/officer/documents', label: 'Documents' },
   { to: '/admin/users', label: 'Users' },

@@ -10,6 +10,7 @@ import FamilyDetailPage from './pages/FamilyDetailPage';
 import FamilyMembersPage from './pages/FamilyMembersPage';
 import DocumentQueuePage from './pages/DocumentQueuePage';
 import FamilyDocumentsPage from './pages/FamilyDocumentsPage';
+import FamilyQueuePage from './pages/FamilyQueuePage';
 import FamilyRelationshipsPage from './pages/FamilyRelationshipsPage';
 import VerificationQueuePage from './pages/VerificationQueuePage';
 import FamilyRegistrationPage from './pages/FamilyRegistrationPage';
@@ -69,6 +70,7 @@ export default function App() {
           <Route path="/officer" element={<OfficerDashboardPage />} />
           <Route path="/officer/relationships" element={<VerificationQueuePage />} />
           <Route path="/officer/documents" element={<DocumentQueuePage />} />
+          <Route path="/officer/families" element={<FamilyQueuePage />} />
         </Route>
       </Route>
 

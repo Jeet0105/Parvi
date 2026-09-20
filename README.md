@@ -173,6 +173,7 @@ script refuses to run when NODE_ENV is production.
 | GET | `/api/relationships/:id` | Owner or permitted officer |
 | PUT | `/api/relationships/:id/verify` | VERIFICATION_OFFICER, ADMIN |
 | GET | `/api/families/:familyId/relationships` | Owner or permitted officer |
+| GET | `/api/families/:familyId/tree` | Owner or permitted officer |
 
 ## Build status
 
@@ -185,8 +186,8 @@ script refuses to run when NODE_ENV is production.
 | 5 | Family registration + Family ID | Done |
 | 6 | Family members | Done |
 | 7 | Relationships + officer verification | Done |
-| 8 | Family tree | In progress |
-| 9 | Documents | Pending |
+| 8 | Family tree | Done |
+| 9 | Documents | In progress |
 | 10 | Officer verification | Pending |
 | 11 | Duplicate detection | Pending |
 | 12 | Government schemes | Pending |

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import ProtectedRoute from './components/ProtectedRoute';
@@ -17,6 +18,10 @@ import RegisterPage from './pages/RegisterPage';
 import useAuth from './hooks/useAuth';
 import Spinner from './components/Spinner';
 import { OFFICER_ROLES, ROLES, homePathForRole } from './utils/roles';
+
+// React Flow is a large dependency and only the tree needs it, so it is
+// split out of the main bundle.
+const FamilyTreePage = lazy(() => import('./pages/FamilyTreePage'));
 
 /** Sends visitors to their role's landing page, or to login. */
 function RootRedirect() {
@@ -45,6 +50,14 @@ export default function App() {
           <Route path="/family/register" element={<FamilyRegistrationPage />} />
           <Route path="/family/members" element={<FamilyMembersPage />} />
           <Route path="/family/relationships" element={<FamilyRelationshipsPage />} />
+          <Route
+            path="/family/tree"
+            element={
+              <Suspense fallback={<Spinner label="Loading family tree" />}>
+                <FamilyTreePage />
+              </Suspense>
+            }
+          />
         </Route>
       </Route>
 

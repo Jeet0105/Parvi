@@ -32,6 +32,46 @@ if (typeof HTMLDialogElement !== 'undefined') {
   }
 }
 
+/**
+ * React Flow measures its container through browser APIs jsdom lacks.
+ *
+ * These stubs let the canvas mount so the surrounding page can be tested.
+ * They report zero-size geometry, so nothing here asserts real positioning --
+ * layout maths is covered directly in treeLayout.test.js instead.
+ */
+if (typeof globalThis.ResizeObserver === 'undefined') {
+  globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
+if (typeof globalThis.DOMMatrixReadOnly === 'undefined') {
+  globalThis.DOMMatrixReadOnly = class DOMMatrixReadOnly {
+    constructor(transform) {
+      const [a = 1, b = 0, c = 0, d = 1, e = 0, f = 0] =
+        typeof transform === 'string'
+          ? (transform.match(/-?\d*\.?\d+/g) || []).map(Number)
+          : [];
+      Object.assign(this, { m22: d, a, b, c, d, e, f });
+    }
+  };
+}
+
+if (typeof globalThis.matchMedia === 'undefined') {
+  globalThis.matchMedia = (query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener() {},
+    removeEventListener() {},
+    addListener() {},
+    removeListener() {},
+    dispatchEvent: () => false,
+  });
+}
+
 afterEach(() => {
   cleanup();
   localStorage.clear();

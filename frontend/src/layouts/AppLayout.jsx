@@ -9,6 +9,7 @@ const CITIZEN_NAV = [
   { to: '/family', label: 'My Family' },
   { to: '/family/members', label: 'Members' },
   { to: '/family/relationships', label: 'Relationships' },
+  { to: '/family/tree', label: 'Family Tree' },
 ];
 
 const OFFICER_NAV = [

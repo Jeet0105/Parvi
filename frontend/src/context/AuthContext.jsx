@@ -29,13 +29,46 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [initialising, setInitialising] = useState(true);
 
-  // Restore a previous session on first paint so a refresh does not log the
-  // user out. The token is still verified by the backend on every request.
+  // Restore a previous session on reload. The stored user is shown immediately
+  // so the UI does not flash, then revalidated against /auth/me -- which also
+  // picks up a role change or a revoked account made since the last visit.
   useEffect(() => {
-    const token = getToken();
-    const stored = readStoredUser();
-    if (token && stored) setUser(stored);
-    setInitialising(false);
+    let cancelled = false;
+
+    async function restore() {
+      const token = getToken();
+      const stored = readStoredUser();
+
+      if (!token) {
+        setInitialising(false);
+        return;
+      }
+
+      if (stored) setUser(stored);
+
+      try {
+        const response = await authApi.me();
+        if (cancelled) return;
+        writeStoredUser(response.data.user);
+        setUser(response.data.user);
+      } catch (error) {
+        if (cancelled) return;
+        // A rejected token means the session is over. Anything else (a network
+        // blip) leaves the cached session in place rather than logging out.
+        if (error.status === 401) {
+          setToken(null);
+          writeStoredUser(null);
+          setUser(null);
+        }
+      } finally {
+        if (!cancelled) setInitialising(false);
+      }
+    }
+
+    restore();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const applySession = useCallback(({ user: nextUser, token }) => {

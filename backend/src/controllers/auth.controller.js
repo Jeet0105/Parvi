@@ -14,4 +14,9 @@ async function login(req, res) {
   return success(res, 200, 'Login successful', result);
 }
 
-module.exports = { register, login };
+async function me(req, res) {
+  // `authenticate` has already loaded the current row from the database.
+  return success(res, 200, 'Profile retrieved', { user: req.user });
+}
+
+module.exports = { register, login, me };

@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppLayout from './layouts/AppLayout';
 import AuthLayout from './layouts/AuthLayout';
+import AdminUsersPage from './pages/AdminUsersPage';
 import CitizenDashboardPage from './pages/CitizenDashboardPage';
 import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -41,6 +42,12 @@ export default function App() {
       <Route element={<ProtectedRoute allowedRoles={OFFICER_ROLES} />}>
         <Route element={<AppLayout />}>
           <Route path="/officer" element={<OfficerDashboardPage />} />
+        </Route>
+      </Route>
+
+      <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}>
+        <Route element={<AppLayout />}>
+          <Route path="/admin/users" element={<AdminUsersPage />} />
         </Route>
       </Route>
 

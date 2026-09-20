@@ -130,6 +130,35 @@ Error:
 
 Authorization is always enforced on the backend; frontend role checks are presentation only.
 
+Citizens self-register. Government accounts cannot be created through the public API
+by design, so seed them:
+
+```bash
+cd backend
+npm run db:seed
+```
+
+| Account | Email | Role |
+| --- | --- | --- |
+| Verification Officer | officer@example.gov | VERIFICATION_OFFICER |
+| District Officer | district@example.gov | DISTRICT_OFFICER |
+| Administrator | admin@example.gov | ADMIN |
+
+All seeded accounts use the password `Password123`. Development only — the seed
+script refuses to run when NODE_ENV is production.
+
+## API endpoints
+
+| Method | Path | Access |
+| --- | --- | --- |
+| GET | `/api/health` | Public |
+| POST | `/api/auth/register` | Public (always creates a CITIZEN) |
+| POST | `/api/auth/login` | Public |
+| GET | `/api/auth/me` | Any authenticated user |
+| GET | `/api/users` | ADMIN |
+| GET | `/api/users/:id` | ADMIN |
+| PUT | `/api/users/:id/role` | ADMIN |
+
 ## Build status
 
 | Phase | Feature | Status |
@@ -137,8 +166,8 @@ Authorization is always enforced on the backend; frontend role checks are presen
 | 1 | Project init + health endpoint | Done |
 | 2 | Database + Prisma schema | Done |
 | 3 | Authentication | Done |
-| 4 | RBAC | In progress |
-| 5 | Family registration + Family ID | Pending |
+| 4 | RBAC + admin user management | Done |
+| 5 | Family registration + Family ID | In progress |
 | 6 | Family members | Pending |
 | 7 | Relationships | Pending |
 | 8 | Family tree | Pending |

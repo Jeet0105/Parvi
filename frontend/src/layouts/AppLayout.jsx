@@ -11,11 +11,21 @@ const CITIZEN_NAV = [
 
 const OFFICER_NAV = [{ to: '/officer', label: 'Verification Queue' }];
 
+const ADMIN_NAV = [
+  { to: '/officer', label: 'Verification Queue' },
+  { to: '/admin/users', label: 'Users' },
+];
+
 export default function AppLayout() {
   const { user, role, logout } = useAuth();
   const navigate = useNavigate();
 
-  const links = role === ROLES.CITIZEN ? CITIZEN_NAV : OFFICER_NAV;
+  const links =
+    role === ROLES.CITIZEN
+      ? CITIZEN_NAV
+      : role === ROLES.ADMIN
+        ? ADMIN_NAV
+        : OFFICER_NAV;
 
   const handleLogout = () => {
     logout();
@@ -73,4 +83,4 @@ export default function AppLayout() {
   );
 }
 
-export { CITIZEN_NAV, OFFICER_NAV, OFFICER_ROLES };
+export { CITIZEN_NAV, OFFICER_NAV, ADMIN_NAV, OFFICER_ROLES };

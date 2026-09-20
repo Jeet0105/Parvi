@@ -1,7 +1,9 @@
 module.exports = {
   testEnvironment: 'node',
   testMatch: ['**/tests/**/*.test.js'],
+  globalSetup: '<rootDir>/tests/setup/globalSetup.js',
   verbose: true,
-  // Tests drive the Express app in-process via supertest; no server listen.
-  testTimeout: 15000,
+  // Tests share one PostgreSQL database, so they must not run in parallel.
+  maxWorkers: 1,
+  testTimeout: 30000,
 };

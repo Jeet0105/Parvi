@@ -49,7 +49,19 @@ family-identity-platform/
 ### Prerequisites
 
 - Node.js 20+
-- PostgreSQL 14+ running locally
+- Docker (for the local PostgreSQL container)
+
+### Database
+
+PostgreSQL runs in Docker on port **5433**, so it does not collide with any
+PostgreSQL already installed on the host.
+
+```bash
+cp .env.example .env      # set POSTGRES_PASSWORD
+docker compose up -d
+```
+
+This creates both `family_identity` and `family_identity_test`.
 
 ### Backend
 
@@ -58,6 +70,12 @@ cd backend
 npm install
 cp .env.example .env      # then fill in DATABASE_URL and JWT_SECRET
 npm run dev
+```
+
+Apply migrations:
+
+```bash
+npm run db:migrate
 ```
 
 The API listens on `http://localhost:5000`.
@@ -106,8 +124,8 @@ Authorization is always enforced on the backend; frontend role checks are presen
 | Phase | Feature | Status |
 | --- | --- | --- |
 | 1 | Project init + health endpoint | Done |
-| 2 | Database + Prisma schema | In progress |
-| 3 | Authentication | Pending |
+| 2 | Database + Prisma schema | Done |
+| 3 | Authentication | In progress |
 | 4 | RBAC | Pending |
 | 5 | Family registration + Family ID | Pending |
 | 6 | Family members | Pending |

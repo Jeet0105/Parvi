@@ -1,0 +1,390 @@
+// Family Identity & Beneficiary Management Platform
+// PostgreSQL is the authoritative source of truth.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  CITIZEN
+  VERIFICATION_OFFICER
+  DISTRICT_OFFICER
+  ADMIN
+}
+
+enum FamilyStatus {
+  DRAFT
+  PENDING_VERIFICATION
+  VERIFIED
+  REJECTED
+}
+
+/// Lifecycle state of a person. Members are never hard-deleted; historical
+/// integrity is preserved by moving them through these states instead.
+enum MemberStatus {
+  ACTIVE
+  INACTIVE
+  DECEASED
+  MIGRATED
+  SEPARATED
+}
+
+enum VerificationStatus {
+  PENDING
+  UNDER_REVIEW
+  VERIFIED
+  REJECTED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum RelationshipType {
+  FATHER
+  MOTHER
+  SON
+  DAUGHTER
+  SPOUSE
+  BROTHER
+  SISTER
+  GRANDFATHER
+  GRANDMOTHER
+  GRANDSON
+  GRANDDAUGHTER
+}
+
+enum DocumentType {
+  BIRTH_CERTIFICATE
+  MARRIAGE_CERTIFICATE
+  RATION_CARD
+  AFFIDAVIT
+  IDENTITY_PROOF
+  ADDRESS_PROOF
+  OTHER
+}
+
+enum SchemeStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ApplicationStatus {
+  APPLIED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+
+/// Outcome of an officer decision on a potential duplicate. The system only
+/// ever flags candidates; a human makes the call and records it here.
+enum DuplicateStatus {
+  PENDING_REVIEW
+  SAME_PERSON
+  DIFFERENT_PERSON
+}
+
+// ---------------------------------------------------------------------------
+// Models
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  mobile       String   @unique
+  passwordHash String
+  role         Role     @default(CITIZEN)
+  /// Scopes a DISTRICT_OFFICER to the district they may review.
+  district     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  ownedFamilies         Family[]                 @relation("FamilyOwner")
+  memberRecords         FamilyMember[]
+  uploadedDocuments     Document[]               @relation("DocumentUploader")
+  verifiedDocuments     Document[]               @relation("DocumentVerifier")
+  verifiedRelationships Relationship[]           @relation("RelationshipVerifier")
+  verifiedFamilies      Family[]                 @relation("FamilyVerifier")
+  verifiedMembers       FamilyMember[]           @relation("MemberVerifier")
+  reviewedDuplicates    DuplicateReview[]        @relation("DuplicateReviewer")
+  reviewedApplications  BeneficiaryApplication[] @relation("ApplicationReviewer")
+  auditLogs             AuditLog[]
+
+  @@index([role])
+  @@index([district])
+}
+
+model Family {
+  id String @id @default(uuid())
+
+  /// Public, human-readable identifier, e.g. GJ-FAM-8A72K91X.
+  /// Stable for the lifetime of the family and free of sensitive identity data.
+  familyId String @unique
+
+  status FamilyStatus @default(DRAFT)
+
+  /// The citizen account that registered this family. Used for ownership checks.
+  ownerId String
+  owner   User   @relation("FamilyOwner", fields: [ownerId], references: [id])
+
+  /// The member designated as Family Head.
+  familyHeadId String?       @unique
+  familyHead   FamilyMember? @relation("FamilyHead", fields: [familyHeadId], references: [id])
+
+  // Location is metadata, deliberately kept out of the Family ID so the ID
+  // survives an address change.
+  state    String @default("Gujarat")
+  district String
+  taluka   String
+  village  String
+  address  String
+
+  // Family-level attributes used by the rule-based eligibility engine.
+  annualIncome Decimal? @db.Decimal(12, 2)
+  ownsHouse    Boolean  @default(false)
+
+  verifiedAt      DateTime?
+  verifiedById    String?
+  verifiedBy      User?     @relation("FamilyVerifier", fields: [verifiedById], references: [id])
+  rejectionReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members       FamilyMember[]           @relation("FamilyMembers")
+  relationships Relationship[]
+  applications  BeneficiaryApplication[]
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([district])
+  @@index([district, status])
+}
+
+model FamilyMember {
+  id       String @id @default(uuid())
+  familyId String
+  family   Family @relation("FamilyMembers", fields: [familyId], references: [id], onDelete: Cascade)
+
+  /// Set when this member also has a login account. Most members do not.
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  name        String
+  dateOfBirth DateTime
+  gender      Gender
+
+  // Denormalised demographics, used for explainable duplicate matching.
+  fatherName String?
+  motherName String?
+  spouseName String?
+
+  /// Drives the Education Support eligibility rule.
+  isStudent Boolean @default(false)
+
+  status             MemberStatus       @default(ACTIVE)
+  verificationStatus VerificationStatus @default(PENDING)
+
+  verifiedAt      DateTime?
+  verifiedById    String?
+  verifiedBy      User?     @relation("MemberVerifier", fields: [verifiedById], references: [id])
+  rejectionReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  headOf             Family?                  @relation("FamilyHead")
+  relationshipsFrom  Relationship[]           @relation("RelationshipFrom")
+  relationshipsTo    Relationship[]           @relation("RelationshipTo")
+  documents          Document[]
+  applications       BeneficiaryApplication[]
+  duplicatesAsSource DuplicateReview[]        @relation("DuplicateSource")
+  duplicatesAsMatch  DuplicateReview[]        @relation("DuplicateMatch")
+
+  @@index([familyId])
+  @@index([verificationStatus])
+  @@index([status])
+  @@index([name])
+  @@index([dateOfBirth])
+}
+
+model Relationship {
+  id       String @id @default(uuid())
+  familyId String
+  family   Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  fromMemberId String
+  fromMember   FamilyMember @relation("RelationshipFrom", fields: [fromMemberId], references: [id], onDelete: Cascade)
+
+  toMemberId String
+  toMember   FamilyMember @relation("RelationshipTo", fields: [toMemberId], references: [id], onDelete: Cascade)
+
+  relationshipType   RelationshipType
+  verificationStatus VerificationStatus @default(PENDING)
+
+  verifiedAt      DateTime?
+  verifiedById    String?
+  verifiedBy      User?     @relation("RelationshipVerifier", fields: [verifiedById], references: [id])
+  rejectionReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  documents Document[]
+
+  /// The same directed relationship may only be asserted once.
+  @@unique([fromMemberId, toMemberId, relationshipType])
+  @@index([familyId])
+  @@index([verificationStatus])
+}
+
+model Document {
+  id       String       @id @default(uuid())
+  memberId String
+  member   FamilyMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  /// Set when the document is evidence for a specific relationship.
+  relationshipId String?
+  relationship   Relationship? @relation(fields: [relationshipId], references: [id], onDelete: SetNull)
+
+  documentType DocumentType
+
+  /// Storage reference only. Binaries live on disk or in object storage,
+  /// never inside PostgreSQL.
+  filePath     String
+  originalName String
+  mimeType     String
+  sizeBytes    Int
+
+  verificationStatus VerificationStatus @default(PENDING)
+
+  uploadedById String
+  uploadedBy   User   @relation("DocumentUploader", fields: [uploadedById], references: [id])
+
+  verifiedById    String?
+  verifiedBy      User?     @relation("DocumentVerifier", fields: [verifiedById], references: [id])
+  rejectionReason String?
+
+  uploadedAt DateTime  @default(now())
+  verifiedAt DateTime?
+  updatedAt  DateTime  @updatedAt
+
+  @@index([memberId])
+  @@index([relationshipId])
+  @@index([verificationStatus])
+}
+
+model Scheme {
+  id          String @id @default(uuid())
+  name        String @unique
+  description String
+
+  /// Declarative rule evaluated by the eligibility engine, e.g.
+  /// { "maxAge": 25, "isStudent": true }
+  eligibilityRule Json
+
+  status SchemeStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  applications BeneficiaryApplication[]
+
+  @@index([status])
+}
+
+model BeneficiaryApplication {
+  id       String @id @default(uuid())
+  familyId String
+  family   Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  memberId String
+  member   FamilyMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  schemeId String
+  scheme   Scheme @relation(fields: [schemeId], references: [id])
+
+  status ApplicationStatus @default(APPLIED)
+
+  reviewedById   String?
+  reviewedBy     User?     @relation("ApplicationReviewer", fields: [reviewedById], references: [id])
+  reviewedAt     DateTime?
+  decisionReason String?
+
+  appliedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// A member may hold only one application per scheme.
+  @@unique([memberId, schemeId])
+  @@index([familyId])
+  @@index([schemeId])
+  @@index([status])
+}
+
+/// A flagged potential duplicate awaiting an officer decision.
+/// The system never merges records automatically.
+model DuplicateReview {
+  id String @id @default(uuid())
+
+  sourceMemberId String
+  sourceMember   FamilyMember @relation("DuplicateSource", fields: [sourceMemberId], references: [id], onDelete: Cascade)
+
+  matchedMemberId String
+  matchedMember   FamilyMember @relation("DuplicateMatch", fields: [matchedMemberId], references: [id], onDelete: Cascade)
+
+  /// Overall similarity, 0-100.
+  score Int
+
+  /// Per-field contributions, kept so the score is explainable to an officer.
+  breakdown Json
+
+  status DuplicateStatus @default(PENDING_REVIEW)
+
+  reviewedById String?
+  reviewedBy   User?     @relation("DuplicateReviewer", fields: [reviewedById], references: [id])
+  reviewedAt   DateTime?
+  reviewNote   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sourceMemberId, matchedMemberId])
+  @@index([status])
+  @@index([score])
+}
+
+/// Append-oriented history of every significant state change.
+model AuditLog {
+  id String @id @default(uuid())
+
+  /// Null for system-generated events.
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  action     String
+  entityType String
+  entityId   String
+
+  oldValue Json?
+  newValue Json?
+  reason   String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([action])
+  @@index([createdAt])
+}

@@ -158,6 +158,11 @@ script refuses to run when NODE_ENV is production.
 | GET | `/api/users` | ADMIN |
 | GET | `/api/users/:id` | ADMIN |
 | PUT | `/api/users/:id/role` | ADMIN |
+| POST | `/api/families` | CITIZEN (one family each) |
+| GET | `/api/families` | Officers (district-scoped) |
+| GET | `/api/families/mine` | CITIZEN |
+| GET | `/api/families/:id` | Owner or permitted officer |
+| PUT | `/api/families/:id` | Owning citizen, unless VERIFIED |
 
 ## Build status
 
@@ -167,8 +172,8 @@ script refuses to run when NODE_ENV is production.
 | 2 | Database + Prisma schema | Done |
 | 3 | Authentication | Done |
 | 4 | RBAC + admin user management | Done |
-| 5 | Family registration + Family ID | In progress |
-| 6 | Family members | Pending |
+| 5 | Family registration + Family ID | Done |
+| 6 | Family members | In progress |
 | 7 | Relationships | Pending |
 | 8 | Family tree | Pending |
 | 9 | Documents | Pending |

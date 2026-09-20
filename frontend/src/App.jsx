@@ -5,6 +5,8 @@ import AppLayout from './layouts/AppLayout';
 import AuthLayout from './layouts/AuthLayout';
 import AdminUsersPage from './pages/AdminUsersPage';
 import CitizenDashboardPage from './pages/CitizenDashboardPage';
+import FamilyDetailPage from './pages/FamilyDetailPage';
+import FamilyRegistrationPage from './pages/FamilyRegistrationPage';
 import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
 import OfficerDashboardPage from './pages/OfficerDashboardPage';
@@ -36,6 +38,8 @@ export default function App() {
       <Route element={<ProtectedRoute allowedRoles={[ROLES.CITIZEN]} />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<CitizenDashboardPage />} />
+          <Route path="/family" element={<FamilyDetailPage />} />
+          <Route path="/family/register" element={<FamilyRegistrationPage />} />
         </Route>
       </Route>
 

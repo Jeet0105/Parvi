@@ -90,11 +90,22 @@ curl http://localhost:5000/api/health
 { "success": true, "message": "Family Identity Platform API is running" }
 ```
 
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The app runs at `http://localhost:5173` and proxies `/api` to the backend,
+so there is no CORS setup in development.
+
 ### Tests
 
 ```bash
-cd backend
-npm test
+cd backend  && npm test   # jest + supertest
+cd frontend && npm test   # vitest + react testing library
 ```
 
 ## API response format

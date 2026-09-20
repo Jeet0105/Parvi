@@ -10,3 +10,4 @@ build/
 coverage/
 .DS_Store
 backend/src/generated/
+frontend/dist/

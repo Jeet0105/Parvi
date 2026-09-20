@@ -1,0 +1,50 @@
+import { Navigate, Route, Routes } from 'react-router-dom';
+
+import ProtectedRoute from './components/ProtectedRoute';
+import AppLayout from './layouts/AppLayout';
+import AuthLayout from './layouts/AuthLayout';
+import CitizenDashboardPage from './pages/CitizenDashboardPage';
+import LoginPage from './pages/LoginPage';
+import NotFoundPage from './pages/NotFoundPage';
+import OfficerDashboardPage from './pages/OfficerDashboardPage';
+import RegisterPage from './pages/RegisterPage';
+import useAuth from './hooks/useAuth';
+import Spinner from './components/Spinner';
+import { OFFICER_ROLES, ROLES, homePathForRole } from './utils/roles';
+
+/** Sends visitors to their role's landing page, or to login. */
+function RootRedirect() {
+  const { isAuthenticated, role, initialising } = useAuth();
+
+  if (initialising) return <Spinner label="Loading" />;
+  return (
+    <Navigate to={isAuthenticated ? homePathForRole(role) : '/login'} replace />
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<RootRedirect />} />
+
+      <Route element={<AuthLayout />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+      </Route>
+
+      <Route element={<ProtectedRoute allowedRoles={[ROLES.CITIZEN]} />}>
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<CitizenDashboardPage />} />
+        </Route>
+      </Route>
+
+      <Route element={<ProtectedRoute allowedRoles={OFFICER_ROLES} />}>
+        <Route element={<AppLayout />}>
+          <Route path="/officer" element={<OfficerDashboardPage />} />
+        </Route>
+      </Route>
+
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+}

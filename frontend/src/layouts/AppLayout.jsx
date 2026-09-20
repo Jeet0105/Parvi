@@ -7,6 +7,7 @@ import { OFFICER_ROLES, ROLES, roleLabel } from '../utils/roles';
 const CITIZEN_NAV = [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/family', label: 'My Family' },
+  { to: '/family/members', label: 'Members' },
 ];
 
 const OFFICER_NAV = [{ to: '/officer', label: 'Verification Queue' }];

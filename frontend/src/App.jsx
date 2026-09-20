@@ -6,6 +6,7 @@ import AuthLayout from './layouts/AuthLayout';
 import AdminUsersPage from './pages/AdminUsersPage';
 import CitizenDashboardPage from './pages/CitizenDashboardPage';
 import FamilyDetailPage from './pages/FamilyDetailPage';
+import FamilyMembersPage from './pages/FamilyMembersPage';
 import FamilyRegistrationPage from './pages/FamilyRegistrationPage';
 import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="/dashboard" element={<CitizenDashboardPage />} />
           <Route path="/family" element={<FamilyDetailPage />} />
           <Route path="/family/register" element={<FamilyRegistrationPage />} />
+          <Route path="/family/members" element={<FamilyMembersPage />} />
         </Route>
       </Route>
 

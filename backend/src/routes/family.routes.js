@@ -1,6 +1,7 @@
 const express = require('express');
 
 const familyController = require('../controllers/family.controller');
+const memberController = require('../controllers/member.controller');
 const { authenticate } = require('../middleware/auth.middleware');
 const { authorize, ROLES, OFFICER_ROLES } = require('../middleware/role.middleware');
 const {
@@ -14,6 +15,12 @@ const {
   familyIdParamSchema,
   listFamiliesQuerySchema,
 } = require('../validators/family.validator');
+const {
+  createMemberSchema,
+  familyIdParamSchema: memberFamilyIdParamSchema,
+  listMembersQuerySchema,
+  changeHeadSchema,
+} = require('../validators/member.validator');
 
 const router = express.Router();
 
@@ -44,6 +51,30 @@ router.put(
   validateParams(familyIdParamSchema),
   validateBody(updateFamilySchema),
   familyController.update
+);
+
+// Members, scoped to a family.
+router.post(
+  '/:familyId/members',
+  authorize(ROLES.CITIZEN),
+  validateParams(memberFamilyIdParamSchema),
+  validateBody(createMemberSchema),
+  memberController.create
+);
+
+router.get(
+  '/:familyId/members',
+  validateParams(memberFamilyIdParamSchema),
+  validateQuery(listMembersQuerySchema),
+  memberController.list
+);
+
+router.put(
+  '/:familyId/head',
+  authorize(ROLES.CITIZEN),
+  validateParams(memberFamilyIdParamSchema),
+  validateBody(changeHeadSchema),
+  memberController.changeHead
 );
 
 module.exports = router;

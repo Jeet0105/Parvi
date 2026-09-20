@@ -11,6 +11,8 @@ const { PrismaPg } = require('@prisma/adapter-pg');
  *
  * Tests run against TEST_DATABASE_URL so they can never touch development data.
  */
+const { Pool } = require('pg');
+
 function resolveConnectionString() {
   const isTest = process.env.NODE_ENV === 'test';
   const url = isTest ? process.env.TEST_DATABASE_URL : process.env.DATABASE_URL;
@@ -29,7 +31,14 @@ function resolveLogLevels() {
   return ['error'];
 }
 
-const adapter = new PrismaPg({ connectionString: resolveConnectionString() });
+const connectionString = resolveConnectionString();
+const isLocalhost = connectionString.includes('localhost') || connectionString.includes('127.0.0.1');
+const pool = new Pool({
+  connectionString,
+  ssl: (!isLocalhost && process.env.NODE_ENV === 'production') ? { rejectUnauthorized: false } : undefined,
+});
+
+const adapter = new PrismaPg(pool);
 
 const prisma = new PrismaClient({
   adapter,
@@ -39,8 +48,16 @@ const prisma = new PrismaClient({
 
 /** Verifies the database is reachable. Used at boot and by tests. */
 async function connectDatabase() {
-  await prisma.$queryRaw`SELECT 1`;
-  return prisma;
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    return prisma;
+  } catch (err) {
+    console.error('Database connection failed. Please verify your DATABASE_URL and database status.');
+    console.error('Connection details:', {
+      host: connectionString.split('@')[1]?.split('/')[0] || 'hidden',
+    });
+    throw err;
+  }
 }
 
 async function disconnectDatabase() {
